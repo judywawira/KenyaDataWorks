@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 
+import atom.http_core
 import oauth2client.client
 from oauth2client.django_orm import FlowField
 from oauth2client.django_orm import CredentialsField
