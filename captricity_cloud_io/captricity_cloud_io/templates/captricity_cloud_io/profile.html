@@ -1,0 +1,11 @@
+<html>
+    <body>
+        <form method="post" action=".">
+            {% csrf_token %}
+            Captricity Token: <input type="text" value="{{ user.captricity_api_token }}" name="captricity-api-token" /><br />
+            CMIS username: <input type="text" value="{{ user.cmis_user }}" name="cmis_user" /><br />
+            CMIS password: <input type="text" value="{{ user.cmis_pass }}" name="cmis_pass" /><br />
+            <input type="submit" value="Submit" />
+        </form>
+    </body>
+</html>

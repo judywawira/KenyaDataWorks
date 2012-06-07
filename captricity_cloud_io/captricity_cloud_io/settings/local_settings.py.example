@@ -1,0 +1,11 @@
+# Define your local settings here
+
+# Captricity API target
+API_TARGET = "https://nightly.captricity.com/api/backbone/schema"
+# API key used to communicate with box
+BOX_API_KEY = 'YOUR BOX API KEY HERE'
+# Information used to communicate with google api
+GOOG_CLIENTID = 'YOUR GOOGLE CLIENT ID HERE'
+GOOG_SECRET_KEY = 'YOUR GOOGLE SECRET KEY HERE'
+
+

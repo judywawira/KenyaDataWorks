@@ -1,0 +1,8 @@
+# Python packages which captricity cloud io app require
+django==1.4
+celery==2.4.2
+django-celery==2.4.2
+
+# Google API
+gdata==2.0.17
+google-api-python-client==1.0beta8

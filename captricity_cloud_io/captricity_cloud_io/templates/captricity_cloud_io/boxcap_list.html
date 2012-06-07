@@ -1,0 +1,175 @@
+<html>
+<head>
+    <meta charset="utf-8">
+
+    <title>BoxCap</title>
+
+    <script src="{{STATIC_URL}}captricity_cloud_io/libs/jquery-1.8.13/js/jquery-1.6.1.min.js"></script>
+    <script src="{{STATIC_URL}}captricity_cloud_io/libs/jquery-1.8.13/js/jquery-ui-1.8.13.custom.min.js"></script>
+    <script src="{{STATIC_URL}}captricity_cloud_io/libs/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}captricity_cloud_io/libs/underscore-min.js"></script>
+
+    <script src="{{STATIC_URL}}captricity_cloud_io/libs/underscore.js"></script>
+    <script src="{{STATIC_URL}}captricity_cloud_io/plugins.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}captricity_cloud_io/libs/backbone-min.js"></script>
+
+
+<style>
+    .file-selected {
+        color: #C2C2C2;
+    }
+
+    .file-deselected {
+        color: #000000;
+    }
+
+    .folders-list {
+        padding-left: 1em;
+    }
+
+    .selected-queue {
+        float: right;
+    }
+</style>
+
+<script type="text/template" id="folders-template">
+    <% if (hidden) { %>
+        <button class="show" id="<%= id %>">Show</button>
+    <% } else { %> 
+        <button class="hide" id="<%= id %>">Hide</button>
+    <% } %>
+    <input type="checkbox" class="select-folder" id="<%= id %>" 
+        <% if (selected) { %>
+            checked="checked"
+        <% } %> 
+    />
+    <%= name %>
+</script>
+
+<script type="text/template" id="file-template">
+    <input type="checkbox" class="select-file" id="<%= id %>" 
+        <% if (selected) { %>
+            checked="checked"
+        <% } %> 
+    />
+    <% if (selected) { %>
+        <span class="file-selected">
+    <% } else { %>
+        <span class="file-deselected">
+    <% } %>
+        <%= file_name %>
+    </span>
+</script>
+
+<script type="text/template" id="folder-tree-template">
+    <ul class="folders-list">
+    </ul>
+</script>
+
+<script type="text/template" id="selected-queue-template">
+    <ul class="selected-files-list">
+    </ul>
+    <br />
+    <button class="upload" id="upload-selected">Upload</button>
+</script>
+
+<script type="text/template" id="upload-queue-template">
+    <ul class="upload-files-list">
+    </ul>
+</script>
+
+<script type="text/template" id="job-selection-list-template">
+    <ul class="job-list">
+    </ul>
+    <button class="select" id="job-selected">Select</button>
+</script>
+
+<script type="text/template" id="job-template">
+    <input type="radio" name="select-job" class="select-job" id="<%= id %>" 
+        <% if (selected) { %>
+            checked="checked"
+        <% } %> 
+    />
+    <% if (selected) { %>
+        <span class="file-selected">
+    <% } else { %>
+        <span class="file-deselected">
+    <% } %>
+        <%= name %>, <%= status %>
+    </span>
+</script>
+    
+<script src="{{STATIC_URL}}captricity_cloud_io/util.js"></script>
+<script src="{{STATIC_URL}}captricity_cloud_io/boxcap.js"></script>
+<script src="{{STATIC_URL}}captricity_cloud_io/cap.js"></script>
+
+<script>
+    window.BoxBrowser = Backbone.Router.extend({
+        routes: {
+            '': 'home',
+            'next': 'boxBrowser',
+        },
+
+        initialize: function() {
+            this.rootView = new BoxFolderView({
+                el: $('<ul id="root-browser"></ul>'),
+                model: window.rootFolder
+            });
+
+            this.queueView = new SelectedQueueView({});
+            this.jlView = new JobListView({});
+        },
+
+        home: function() {
+            $('#box-browser').empty();
+            $('#box-browser').append(this.jlView.render().el);
+        },
+
+        boxBrowser: function() {
+            $('#box-browser').empty();
+            $('#box-browser').append(this.rootView.render().el);
+            $('#box-browser').append(this.queueView.render().el);
+        },
+    });
+
+    // Basic variables for communicating with box
+    var box_api_key = "{{box_api_key}}";
+    var auth_token = $.getUrlVar('auth_token');
+
+    // Using YQL to get around the Javascript Same Origin Policy.
+    // See http://developers.blog.box.com/2011/09/28/using-the-box-api-with-javascript/ for more details
+    var base_query = "select * from xml where url = ";
+    var base_yql = "http://query.yahooapis.com/v1/public/yql?format=json&q=";
+
+    $(document).ready(function() {
+        // If we have no auth token with box, attempt to get one using box's authentication method
+        if (!auth_token) {
+            alert("Will transfer to box.net");
+            $.getJSON(base_yql + encodeURIComponent(base_query + "'https://www.box.net/api/1.0/rest?action=get_ticket&api_key=" + window.box_api_key + "'"),
+                      function (response) {
+                          window.ticket = response.query.results.response.ticket;
+                          window.location.href = 'https://m.box.net/api/1.0/auth/' + window.ticket;
+                      });
+        }
+        else {
+            // We have authentication with box, so load the app
+            window.rootFolder = new BoxFolder({id:'0', name:'/'});
+            window.selectedFiles = new BoxFiles();
+            window.jobs = new JobCollection();
+            window.jobs.fetch({ data: $.param({ status: "setup" })});
+            window.selectedJob = null;
+            window.App = new BoxBrowser();
+            Backbone.history.start();
+        }
+    });
+</script>
+</head>
+
+<body>
+<div id="box-browser">
+</div>
+</body>
+
+</html>
+
+
