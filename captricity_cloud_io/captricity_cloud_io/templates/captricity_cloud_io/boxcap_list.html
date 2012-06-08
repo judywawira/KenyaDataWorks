@@ -1,19 +1,8 @@
-<html>
-<head>
-    <meta charset="utf-8">
+{% extends "base.html" %}
 
-    <title>BoxCap</title>
+{% block title %}BoxCap{% endblock %}
 
-    <script src="{{STATIC_URL}}captricity_cloud_io/libs/jquery-1.8.13/js/jquery-1.6.1.min.js"></script>
-    <script src="{{STATIC_URL}}captricity_cloud_io/libs/jquery-1.8.13/js/jquery-ui-1.8.13.custom.min.js"></script>
-    <script src="{{STATIC_URL}}captricity_cloud_io/libs/jquery.tmpl.min.js"></script>
-    <script type="text/javascript" src="{{STATIC_URL}}captricity_cloud_io/libs/underscore-min.js"></script>
-
-    <script src="{{STATIC_URL}}captricity_cloud_io/libs/underscore.js"></script>
-    <script src="{{STATIC_URL}}captricity_cloud_io/plugins.js"></script>
-    <script type="text/javascript" src="{{STATIC_URL}}captricity_cloud_io/libs/backbone-min.js"></script>
-
-
+{% block sub-head %}
 <style>
     .file-selected {
         color: #C2C2C2;
@@ -104,6 +93,9 @@
 <script src="{{STATIC_URL}}captricity_cloud_io/cap.js"></script>
 
 <script>
+    window.schema = new captricity.APISchema();
+    schema.bind('reset', initialize);
+
     window.BoxBrowser = Backbone.Router.extend({
         routes: {
             '': 'home',
@@ -153,23 +145,23 @@
         }
         else {
             // We have authentication with box, so load the app
-            window.rootFolder = new BoxFolder({id:'0', name:'/'});
-            window.selectedFiles = new BoxFiles();
-            window.jobs = new JobCollection();
-            window.jobs.fetch({ data: $.param({ status: "setup" })});
-            window.selectedJob = null;
-            window.App = new BoxBrowser();
-            Backbone.history.start();
+            schema.fetch();
         }
     });
-</script>
-</head>
 
-<body>
+    function initialize() {
+        window.rootFolder = new BoxFolder({id:'0', name:'/'});
+        window.selectedFiles = new BoxFiles();
+        window.selectedJob = null;
+        window.App = new BoxBrowser();
+        Backbone.history.start();
+    }
+</script>
+{% endblock %}
+
+{% block body %}
 <div id="box-browser">
 </div>
-</body>
-
-</html>
+{% endblock %}
 
 

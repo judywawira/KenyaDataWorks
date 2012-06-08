@@ -5,6 +5,7 @@ from django.conf.urls.defaults import patterns, url
 urlpatterns = patterns('',
     (r'^$', 'captricity_cloud_io.views.home'),
 
+    (r'^captricity_api/$', 'captricity_cloud_io.views.captricity_api'),
     (r'^cap-jobs/$', 'captricity_cloud_io.views.cap_jobs'),
     (r'^cap-sheet-image/(?P<sheet_id>[\d]+)/$', 'captricity_cloud_io.views.cap_sheet_image'),
     (r'^cap-callback/$', 'captricity_cloud_io.views.captricity_callback'),

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+
+        <title>{% block title %}{% block sub-title %}{% endblock %}{{ site.name }}{% endblock %}</title>
+
+        <script src="{{STATIC_URL}}captricity_cloud_io/libs/jquery-1.8.13/js/jquery-1.6.1.min.js"></script>
+        <script src="{{STATIC_URL}}captricity_cloud_io/libs/jquery-1.8.13/js/jquery-ui-1.8.13.custom.min.js"></script>
+        <script src="{{STATIC_URL}}captricity_cloud_io/libs/jquery.tmpl.min.js"></script>
+        <script type="text/javascript" src="{{STATIC_URL}}captricity_cloud_io/libs/underscore-min.js"></script>
+
+        <script src="{{STATIC_URL}}captricity_cloud_io/libs/underscore.js"></script>
+        <script src="{{STATIC_URL}}captricity_cloud_io/plugins.js"></script>
+        <script type="text/javascript" src="{{STATIC_URL}}captricity_cloud_io/libs/backbone-min.js"></script>
+
+        <script>
+        {% if request.user.get_profile.captricity_api_token %}
+            window.captricityApiToken = '{{request.user.get_profile.captricity_api_token}}';
+        {% else %}
+            window.captricityApiToken = null;
+        {% endif %}
+        </script>
+
+        <script src="{% url captricity_cloud_io.views.captricity_api %}"></script>
+        <script src="{{STATIC_URL}}base.js"></script>
+
+        {% block sub-head %}{% endblock %}
+
+    </head>
+
+    <body>{% block body %}{% endblock %}</body>
+</html>
+
+
+

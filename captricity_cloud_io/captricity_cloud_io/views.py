@@ -7,6 +7,7 @@ import simplejson as json
 from xml.dom import minidom
 
 from django.template import RequestContext 
+from django.template.loader import render_to_string
 from django.shortcuts import redirect, render_to_response, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -30,6 +31,10 @@ def home(request):
     return render_to_response('captricity_cloud_io/index.html', {}, context_instance=RequestContext(request))
 
 # Captricity API
+def captricity_api(request):
+    api_js = render_to_string('captricity_cloud_io/captricity_api.js', {}, context_instance=RequestContext(request))
+    return HttpResponse(api_js, mimetype='text/javascript');
+
 @login_required
 def cap_jobs(request):
     profile = request.user.get_profile()

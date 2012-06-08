@@ -1,15 +1,3 @@
-var Sheet = Backbone.Model.extend({});
-
-var Job = Backbone.Model.extend({
-    initialize: function() {
-        this.set({selected: false});
-    }
-});
-var JobCollection = Backbone.Collection.extend({
-    model: Job,
-    url: '/cap-jobs/'
-});
-
 var JobView = Backbone.View.extend({
     tagName: 'li',
     template: _.template($('#job-template').html()),
@@ -27,6 +15,9 @@ var JobView = Backbone.View.extend({
 
     initialize: function() {
         _.bindAll(this, 'render');
+        if (this.model.get('selected') == undefined) {
+            this.model.set({ selected: false });
+        }
     },
 
     render: function() {
@@ -42,7 +33,24 @@ var JobListView = Backbone.View.extend({
 
     initialize: function() {
         _.bindAll(this, 'render');
-        window.jobs.bind('reset', this.render);
+        this.failedFetch = false;
+        this.collection = new captricity.api.Jobs();
+        this.collection.bind('reset', this.render, this);
+        this.collection.fetch({
+            success: this.handleFetchSuccess,
+            error: this.handleFetchError,
+            data: $.param({ status: 'setup' }),
+        });
+    },
+
+    handleFetchSuccess: function(collection, response){
+        this.failedFetch = false;
+    },
+
+    handleFetchError: function(collection, response){
+        console.log(response);
+        this.failedFetch = true;
+        this.render();
     },
 
     events: {
@@ -54,9 +62,19 @@ var JobListView = Backbone.View.extend({
     },
 
     render: function() {
+        if(this.failedFetch){
+            $(this.el).append('<h2>Failed to fetch your list of jobs.</h2>');
+            $(this.el).append('<p>Is the API token set on your user profile?</p>');
+            return this;
+        }
+        if(this.collection.length == 0){
+            $(this.el).append('<h2>No jobs found.</h2>');
+            return this;
+        }
+        
         $(this.el).html(this.template({}));
         var $jobs = this.$('.job-list');
-        window.jobs.each(function (job) {
+        this.collection.each(function (job) {
             var view = new JobView({
                 model: job
             });
@@ -88,6 +106,16 @@ var DocumentListView = Backbone.View.extend({
 
     initialize: function() {
         _.bindAll(this, 'render');
+        this.document = window.selectedJob.get('document');
+    },
+
+    handleFetchSuccess: function(collection, response){
+        this.failedFetch = false;
+    },
+
+    handleFetchError: function(collection, response){
+        this.failedFetch = true;
+        this.render();
     },
 
     events: {
@@ -106,9 +134,14 @@ var DocumentListView = Backbone.View.extend({
     render: function() {
         $(this.el).html(this.template({}));
         var $sheets = this.$('.sheet-list');
-        _.each(window.selectedJob.get('document')['sheets'], function(sheet) {
+        _.each(this.document['sheets'], function(sheet) {
+            var sheet_model = new captricity.api.Sheet(id=sheet['id'])
+            sheet_model.fetch({
+                success: this.handleFetchSuccess,
+                error: this.handleFetchError
+            });
             var view = new SheetImageView({
-                model: new Sheet(sheet)
+                model: sheet_model,
             });
             $sheets.append(view.render().el);
         });
