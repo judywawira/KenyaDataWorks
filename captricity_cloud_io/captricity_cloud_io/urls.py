@@ -3,12 +3,15 @@ from django.conf import settings
 from django.conf.urls.defaults import patterns, url
 
 urlpatterns = patterns('',
-    (r'^home/$', 'captricity_cloud_io.views.home'),
+    (r'^$', 'captricity_cloud_io.views.home'),
+
+    (r'^cap-jobs/$', 'captricity_cloud_io.views.cap_jobs'),
+    (r'^cap-sheet-image/(?P<sheet_id>[\d]+)/$', 'captricity_cloud_io.views.cap_sheet_image'),
+    (r'^cap-callback/$', 'captricity_cloud_io.views.captricity_callback'),
+    (r'^cap-login/$', 'captricity_cloud_io.views.captricity_login'),
 
     (r'^boxcap/list/$', 'captricity_cloud_io.views.boxcap_list'),
     (r'^boxcap/upload/$', 'captricity_cloud_io.views.upload'),
-    (r'^cap-jobs/$', 'captricity_cloud_io.views.cap_jobs'),
-    (r'^cap-sheet-image/(?P<sheet_id>[\d]+)/$', 'captricity_cloud_io.views.cap_sheet_image'),
 
     (r'^gdata-login/$', 'captricity_cloud_io.views.gdata_login'),
     (r'^gdata-oauth-callback/$', 'captricity_cloud_io.views.oauth2_callback'),

@@ -1,5 +1,7 @@
 import urllib2
+import urllib
 import Image
+import copy
 import cStringIO as StringIO
 import simplejson as json
 from xml.dom import minidom
@@ -18,7 +20,7 @@ from oauth2client.client import OAuth2WebServerFlow
 from captricity_cloud_io.models import CredentialsModel, FlowModel, SyncedDocument
 import gdata.spreadsheets.client
 
-from captricity_cloud_io.tasks import upload_to_captricity_by_url, upload_to_google, upload_to_captricity_by_cmis
+from captricity_cloud_io.tasks import upload_to_captricity_by_url, upload_to_google
 from captricity_cloud_io.captricity_client import Client
 
 from captricity_client import generate_request_access_signature
@@ -31,7 +33,7 @@ def home(request):
 @login_required
 def cap_jobs(request):
     profile = request.user.get_profile()
-    if profile.captricity_api_token == '' 
+    if profile.captricity_api_token == '':
         return JsonResponse({"status":"failed"})
 
     # Get the jobs from captricity to feed into Backbone
@@ -40,7 +42,7 @@ def cap_jobs(request):
 @login_required
 def cap_sheet_image(request, sheet_id):
     profile = request.user.get_profile()
-    if profile.captricity_api_token == '' 
+    if profile.captricity_api_token == '':
         return JsonResponse({"status":"failed"})
 
     response = HttpResponse(mimetype="image/png")
@@ -52,17 +54,14 @@ def cap_sheet_image(request, sheet_id):
 
 @login_required
 def captricity_callback(request):
-    # First check that user granted access
-    if 'request-accepted' not in request.GET:
-        return # TODO: error page
-
-    # Check signature
-    signature_params = {
-            'request-accepted' : request.GET['request-accepted'],
-            'token' : request.GET['token']
-    }
+    # First check signature
+    signature_params = copy.copy(request.GET)
+    del signature_params['signature']
     if generate_request_access_signature(signature_params, settings.CAPTRICITY_SECRET_KEY) != request.GET['signature']:
-        return # TODO error page
+        return HttpResponseRedirect(reverse('captricity_cloud_io.views.home'))
+
+    if 'request-denied' in signature_params:
+        return HttpResponseRedirect(reverse('captricity_cloud_io.views.home'))
 
     # Update user profile and redirect user
     profile = request.user.get_profile()
@@ -71,7 +70,7 @@ def captricity_callback(request):
     return HttpResponseRedirect(reverse('captricity_cloud_io.views.home'))
 
 @login_required
-def captrcity_login(request):
+def captricity_login(request):
     # First check to see if user already granted access
     # If user already granted access, redirect to home page
     profile = request.user.get_profile()

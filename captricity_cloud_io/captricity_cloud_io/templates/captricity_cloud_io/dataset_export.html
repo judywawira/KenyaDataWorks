@@ -97,11 +97,11 @@
                 data: { job_id: window.selectedJob.get('id') },
                 success: function(response) {
                     if (response.status == 'success') {
-                        alert("Successfully initiated download task on Captricity");
+                        alert("Successfully initiated upload task on Captricity Cloud IO");
                         window.App.navigate('', true);
                     }
                     else {
-                        alert("Unsuccessful initiation of download task");
+                        alert("Unsuccessful initiation of upload task");
                     }
                 },
             });

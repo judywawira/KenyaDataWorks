@@ -21,7 +21,7 @@ class UserProfile(models.Model):
     user = models.ForeignKey(User, unique=True)
 
     def get_captricity_client(self):
-        return Client(endpoint=settings.API_TARGET+"api/schema/backbone/", api_token=self.captricity_api_token)
+        return Client(endpoint=settings.API_TARGET+"api/backbone/schema", api_token=self.captricity_api_token)
 
 # Model for tracking phase in oauth2.0 flow
 class FlowModel(models.Model):
