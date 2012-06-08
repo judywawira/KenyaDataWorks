@@ -10,6 +10,7 @@ import httplib
 import httplib2
 import tempfile
 import simplejson
+import math
 
 from django.contrib.auth.models import User
 
@@ -28,14 +29,17 @@ def upload_to_captricity_by_url(source_urls, job_id, user_profile_id):
 def _upload_to_captricity_by_url(source_urls, job_id, user_profile_id):
     """Pull resource from url and upload to captricity"""
     client = UserProfile.objects.get(id=user_profile_id).get_captricity_client()
-    for file_data in source_urls:
-        os_handle, path = tempfile.mkstemp()
-        os.close(os_handle)
-        f = open(path, "w+")
-        f.write(urllib2.urlopen(file_data['url']).read())
-        f.close()
-        client.update_job(job_id, {"images":open(path)})
-        os.remove(path)
+    page_count = client.read_job(job_id)['document']['sheet_count']
+    for i in range(int(math.ceil(len(source_urls) / float(page_count)))):
+        iset = client.update_instance_sets(job_id, {'name':'iset '+str(i)})
+        for page_number,file_data in enumerate(source_urls[i:i+page_count]):
+            os_handle, path = tempfile.mkstemp()
+            os.close(os_handle)
+            f = open(path, "w+")
+            f.write(urllib2.urlopen(file_data['url']).read())
+            f.close()
+            client.update_iset_instance(iset['id'], page_number, {'image':open(path), 'image_name':os.path.splitext(os.path.basename(path))[0]})
+            os.remove(path)
 
 def upload_to_google(job_id, user_id, sync_task):
     _upload_to_google.delay(job_id, user_id, sync_task)
