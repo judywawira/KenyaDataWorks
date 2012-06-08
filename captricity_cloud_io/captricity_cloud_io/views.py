@@ -75,7 +75,7 @@ def captricity_login(request):
     # If user already granted access, redirect to home page
     profile = request.user.get_profile()
     if profile.captricity_api_token != '':
-        return # TODO: redirect
+        return HttpResponseRedirect(reverse('captricity_cloud_io.views.home'))
 
     # Otherwise start captricity login flow
     login_url = settings.API_TARGET + "accounts/request-access/"
