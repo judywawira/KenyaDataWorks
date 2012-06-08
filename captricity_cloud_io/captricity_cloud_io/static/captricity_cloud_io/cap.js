@@ -31,16 +31,24 @@ var JobListView = Backbone.View.extend({
     className: 'job-list-view',
     template: _.template($('#job-selection-list-template').html()),
 
-    initialize: function() {
+    initialize: function(params) {
         _.bindAll(this, 'render');
         this.failedFetch = false;
         this.collection = new captricity.api.Jobs();
         this.collection.bind('reset', this.render, this);
-        this.collection.fetch({
-            success: this.handleFetchSuccess,
-            error: this.handleFetchError,
-            data: $.param({ status: 'setup' }),
-        });
+        if (params.filter == undefined) {
+            this.collection.fetch({
+                success: this.handleFetchSuccess,
+                error: this.handleFetchError,
+            });
+        }
+        else {
+            this.collection.fetch({
+                success: this.handleFetchSuccess,
+                error: this.handleFetchError,
+                data: $.param({ status: params.filter }),
+            });
+        }
     },
 
     handleFetchSuccess: function(collection, response){
@@ -106,7 +114,6 @@ var DocumentListView = Backbone.View.extend({
 
     initialize: function() {
         _.bindAll(this, 'render');
-        this.document = window.selectedJob.get('document');
     },
 
     handleFetchSuccess: function(collection, response){
@@ -134,8 +141,8 @@ var DocumentListView = Backbone.View.extend({
     render: function() {
         $(this.el).html(this.template({}));
         var $sheets = this.$('.sheet-list');
-        _.each(this.document['sheets'], function(sheet) {
-            var sheet_model = new captricity.api.Sheet(id=sheet['id'])
+        _.each(window.selectedJob.get('document')['sheets'], function(sheet) {
+            var sheet_model = new captricity.api.Sheet({id:sheet['id']})
             sheet_model.fetch({
                 success: this.handleFetchSuccess,
                 error: this.handleFetchError
