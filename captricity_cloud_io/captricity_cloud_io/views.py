@@ -21,20 +21,73 @@ import gdata.spreadsheets.client
 from captricity_cloud_io.tasks import upload_to_captricity_by_url, upload_to_google, upload_to_captricity_by_cmis
 from captricity_cloud_io.captricity_client import Client
 
+from captricity_client import generate_request_access_signature
+
+@login_required
+def home(request):
+    return render_to_response('captricity_cloud_io/index.html', {}, context_instance=RequestContext(request))
+
 # Captricity API
 @login_required
 def cap_jobs(request):
+    profile = request.user.get_profile()
+    if profile.captricity_api_token == '' 
+        return JsonResponse({"status":"failed"})
+
     # Get the jobs from captricity to feed into Backbone
-    return JsonResponse(request.user.get_profile().get_captricity_client().read_jobs(params=request.GET))
+    return JsonResponse(profile.get_captricity_client().read_jobs(params=request.GET))
 
 @login_required
 def cap_sheet_image(request, sheet_id):
+    profile = request.user.get_profile()
+    if profile.captricity_api_token == '' 
+        return JsonResponse({"status":"failed"})
+
     response = HttpResponse(mimetype="image/png")
-    image_data = request.user.get_profile().get_captricity_client().read_sheet_image(sheet_id, accept="image/png")
+    image_data = profile.get_captricity_client().read_sheet_image(sheet_id, accept="image/png")
     image_fake_file = StringIO.StringIO(image_data)
     image = Image.open(image_fake_file)
     image.save(response, "PNG")
     return response
+
+@login_required
+def captricity_callback(request):
+    # First check that user granted access
+    if 'request-accepted' not in request.GET:
+        return # TODO: error page
+
+    # Check signature
+    signature_params = {
+            'request-accepted' : request.GET['request-accepted'],
+            'token' : request.GET['token']
+    }
+    if generate_request_access_signature(signature_params, settings.CAPTRICITY_SECRET_KEY) != request.GET['signature']:
+        return # TODO error page
+
+    # Update user profile and redirect user
+    profile = request.user.get_profile()
+    profile.captricity_api_token = request.GET['token']
+    profile.save()
+    return HttpResponseRedirect(reverse('captricity_cloud_io.views.home'))
+
+@login_required
+def captrcity_login(request):
+    # First check to see if user already granted access
+    # If user already granted access, redirect to home page
+    profile = request.user.get_profile()
+    if profile.captricity_api_token != '':
+        return # TODO: redirect
+
+    # Otherwise start captricity login flow
+    login_url = settings.API_TARGET + "accounts/request-access/"
+    callback_url = "http://" + Site.objects.get_current().domain + reverse('captricity_cloud_io.views.captricity_callback')
+    params = {
+            'return-url' : callback_url,
+            'third-party-id' : settings.CAPTRICITY_CLIENTID
+    }
+    params['signature'] = generate_request_access_signature(params, settings.CAPTRICITY_SECRET_KEY)
+    login_url += '?' + urllib.urlencode(params)
+    return HttpResponseRedirect(login_url)
 
 # boxcap
 @login_required

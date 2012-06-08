@@ -3,6 +3,8 @@ from django.conf import settings
 from django.conf.urls.defaults import patterns, url
 
 urlpatterns = patterns('',
+    (r'^home/$', 'captricity_cloud_io.views.home'),
+
     (r'^boxcap/list/$', 'captricity_cloud_io.views.boxcap_list'),
     (r'^boxcap/upload/$', 'captricity_cloud_io.views.upload'),
     (r'^cap-jobs/$', 'captricity_cloud_io.views.cap_jobs'),
