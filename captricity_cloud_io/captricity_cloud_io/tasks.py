@@ -29,10 +29,15 @@ def upload_to_captricity_by_url(source_urls, job_id, user_profile_id):
 def _upload_to_captricity_by_url(source_urls, job_id, user_profile_id):
     """Pull resource from url and upload to captricity"""
     client = UserProfile.objects.get(id=user_profile_id).get_captricity_client()
+    # First find out how many pages there are in the document, so that we know how to group the list of images into image sets
     page_count = client.read_job(job_id)['document']['sheet_count']
+    # Assume the images are in order, neatly sorted into image sets
     for i in range(int(math.ceil(len(source_urls) / float(page_count)))):
+        # For each group of images in a image set, create the instance set on the captricity server
         iset = client.update_instance_sets(job_id, {'name':'iset '+str(i)})
+        # Then upload in order, assuming they are in page number order
         for page_number,file_data in enumerate(source_urls[i:i+page_count]):
+            # Since we can't upload a url, and since the captricity python client is not compatible with "file-like" objects, so first retrieve the file from the url on to disk, then pass the local file to captricity python client to upload
             os_handle, path = tempfile.mkstemp()
             os.close(os_handle)
             f = open(path, "w+")
@@ -50,6 +55,7 @@ def _upload_to_google(job_id, user_id, sync_task):
     user = User.objects.get(id=user_id)
 
     # Get csv
+    # We must first get the job, then get all datasets associated with the job. This is so that we get the metadata for datasets so we know which one to pull from captricity. We always pick the first one in the list. Once selected and we know the dataset id, retrieve the csv file
     client = user.get_profile().get_captricity_client()
     job = client.read_job(job_id)
     datasets = client.read_datasets(job_id)
@@ -59,7 +65,7 @@ def _upload_to_google(job_id, user_id, sync_task):
     gclient = gdata.docs.client.DocsClient()
     gclient = _authorize_client(user, gclient)
 
-    # write csv to file
+    # write csv to file and upload to google spreadsheets
     os_handle, path = tempfile.mkstemp(suffix=".csv")
     os.close(os_handle)
     f = open(path, "w+")
@@ -113,7 +119,7 @@ def _sync_job_document(document_name, user_id, spreadsheet_key):
     for job_id in candidates:
         if job_id in synced_jobs:
             continue
-        # get csv
+        # get csv in a similar manner as upload to google task
         datasets = client.read_datasets(job_id)
         dataset_id = datasets[0]['id']
         csv_data = client.read_dataset(dataset_id, accept="text/csv")

@@ -20,6 +20,7 @@ class UserProfile(models.Model):
     box_auth_token = models.CharField(max_length=128, blank=True)
     user = models.ForeignKey(User, unique=True)
 
+    # Create an authenticated captricity client for the endpoint specified in the settings, using the api token received from authentication workflow for captricity
     def get_captricity_client(self):
         return Client(endpoint=settings.CAPTRICITY_SCHEMA_URL, api_token=self.captricity_api_token)
 
