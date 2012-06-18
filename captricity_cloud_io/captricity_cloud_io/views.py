@@ -37,6 +37,7 @@ def captricity_api(request):
 
 @login_required
 def cap_sheet_image(request, sheet_id):
+    # The user needs to register their api token first
     profile = request.user.get_profile()
     if profile.captricity_api_token == '':
         return JsonResponse({"status":"failed"})
@@ -56,17 +57,32 @@ def captricity_callback(request):
     del signature_params['signature']
     if generate_request_access_signature(signature_params, settings.CAPTRICITY_SECRET_KEY) != request.GET['signature']:
         # signature failed to verify, so do nothing (possible man in the middle attack)
-        return HttpResponseRedirect(reverse('captricity_cloud_io.views.home'))
+        return render_to_response('captricity_cloud_io/captricity_callback.html',
+                {
+                    'redirect' : reverse('captricity_cloud_io.views.home'),
+                    'alert_msg' : "Signature failed to verify from " + settings.API_TARGET,
+                },
+                context_instance=RequestContext(request))
 
     # If the request was denied, do nothing
     if 'request-denied' in signature_params:
-        return HttpResponseRedirect(reverse('captricity_cloud_io.views.home'))
+        return render_to_response('captricity_cloud_io/captricity_callback.html',
+                {
+                    'redirect' : reverse('captricity_cloud_io.views.home'),
+                    'alert_msg' : "You denied request for access to Captricity. Some features of this page will be unusable.",
+                },
+                context_instance=RequestContext(request))
 
     # Otherwise update user profile with captricity api token and redirect user
     profile = request.user.get_profile()
     profile.captricity_api_token = request.GET['token']
     profile.save()
-    return HttpResponseRedirect(reverse('captricity_cloud_io.views.home'))
+    return render_to_response('captricity_cloud_io/captricity_callback.html',
+            {
+                'redirect' : reverse('captricity_cloud_io.views.home'),
+                'alert_msg' : "Request for access to Captricity was granted!",
+            },
+            context_instance=RequestContext(request))
 
 @login_required
 def captricity_login(request):
