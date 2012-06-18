@@ -23,6 +23,7 @@ Then specify each of the variables:
 Once the variables are set, use the install_demouser manage.py command to install a demo user (username alice, password 1234), runserver to start the server, and celeryd to start the asynchronous task manager
 
     ./manage.py install_demouser
+    ./manage.py set_site_domain
     ./manage.py runserver
     ./manage.py celeryd -B
 
