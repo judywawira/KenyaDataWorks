@@ -9,12 +9,6 @@ from oauth2client.django_orm import CredentialsField
 
 from captricity_cloud_io.captricity_client import Client
 
-# Model for tracking document sync up
-class SyncedDocument(models.Model):
-    user = models.ForeignKey(User)
-    document = models.CharField(max_length=128)
-    spreadsheet = models.CharField(max_length=128)
-
 class UserProfile(models.Model):
     captricity_api_token = models.CharField(max_length=128, blank=True)
     box_auth_token = models.CharField(max_length=128, blank=True)

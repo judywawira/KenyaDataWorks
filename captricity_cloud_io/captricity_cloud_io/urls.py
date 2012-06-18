@@ -19,8 +19,6 @@ urlpatterns = patterns('',
     (r'^queue-for-gdata-upload/$', 'captricity_cloud_io.views.queue_for_gdata_upload'),
     (r'^test-gdata-token/$', 'captricity_cloud_io.views.test_gdata_token'),
     (r'^gdata-resources/$', 'captricity_cloud_io.views.gdata_list'),
-    (r'^register-sync/$', 'captricity_cloud_io.views.register_gdata_sync'),
-    (r'^register-create-sync/$', 'captricity_cloud_io.views.register_create_sync'),
 
     (r'^accounts/login/$', 'django.contrib.auth.views.login',
                                 {'template_name': 'captricity_cloud_io/login.html'}),

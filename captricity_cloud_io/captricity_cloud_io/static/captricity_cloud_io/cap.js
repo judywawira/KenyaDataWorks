@@ -131,7 +131,21 @@ var DocumentListView = Backbone.View.extend({
     },
 
     continueSelection: function() {
-        window.App.navigate('sync', true);
+        $.ajax({
+            type: 'POST',
+            url: window.gdata_upload_url,
+            dataType: 'json',
+            data: { job_id: window.selectedJob.get('id') },
+            success: function(response) {
+                if (response.status == 'success') {
+                    alert("Successfully initiated upload task on Captricity Cloud IO");
+                    window.App.navigate('', true);
+                }
+                else {
+                    alert("Unsuccessful initiation of upload task");
+                }
+            },
+        });
     },
 
     abortSelection: function() {

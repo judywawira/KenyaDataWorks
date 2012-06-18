@@ -7,7 +7,6 @@
     <ul class="job-list">
     </ul>
     <button class="select" id="job-selected">Upload</button>
-    <button class="sync" id="job-sync">Sync</button>
 </script>
 
 <script type="text/template" id="job-template">
@@ -26,7 +25,7 @@
 </script>
 
 <script type="text/template" id="job-document-template">
-    <p>Sync this document?</p>
+    <p>Upload this document?</p>
     <ul class='sheet-list'>
     </ul>
     <button class="continue" id="select-document">Yes</button>
@@ -37,63 +36,22 @@
     <img src="/cap-sheet-image/<%= id %>/" />
 </script>
 
-<script type="text/template" id="gdata-spreadsheet-list-template">
-    <ul class="spreadsheet-list">
-    </ul>
-    <button class="sync" id="job-sync">Sync Job with Google</button>
-    <button class="new-sync" id="job-new-sync">Create new spreadsheet</button>
-</script>
-
-<script type="text/template" id="gdata-spreadsheet-template">
-    <input type="radio" name="select-spreadsheet" class="select-spreadsheet" id="<%= id %>" 
-        <% if (selected) { %>
-            checked="checked"
-        <% } %> 
-    />
-    <% if (selected) { %>
-        <span class="file-selected">
-    <% } else { %>
-        <span class="file-deselected">
-    <% } %>
-        <%= title %>
-    </span>
-</script>
-
  
 <script src="{{STATIC_URL}}captricity_cloud_io/util.js"></script>
 <script src="{{STATIC_URL}}captricity_cloud_io/cap.js"></script>
-<script src="{{STATIC_URL}}captricity_cloud_io/goog.js"></script>
 
 <script>
+    window.gdata_upload_url = "{% url captricity_cloud_io.views.queue_for_gdata_upload %}"
     window.schema = new captricity.APISchema();
     schema.bind('reset', initialize);
 
     UploadJobListView = JobListView.extend({
         events: {
             'click .select': 'selectJob',
-            'click .sync': 'syncJob',
-        },
-
-        syncJob: function() {
-            window.App.navigate('confirm', true);
         },
 
         selectJob: function() {
-            $.ajax({
-                type: 'POST',
-                url: {% url captricity_cloud_io.views.queue_for_gdata_upload %},
-                dataType: 'json',
-                data: { job_id: window.selectedJob.get('id') },
-                success: function(response) {
-                    if (response.status == 'success') {
-                        alert("Successfully initiated upload task on Captricity Cloud IO");
-                        window.App.navigate('', true);
-                    }
-                    else {
-                        alert("Unsuccessful initiation of upload task");
-                    }
-                },
-            });
+            window.App.navigate('confirm', true);
         },
     });
 
@@ -101,12 +59,10 @@
         routes: {
             '': 'home',
             'confirm': 'confirmDoc',
-            'sync': 'sync',
         },
 
         initialize: function() {
             this.jlView = new UploadJobListView({filter: 'completed'});
-            this.ssView = new SpreadsheetListView({});
             this.dlView = new DocumentListView({});
         },
 
@@ -118,11 +74,6 @@
         confirmDoc: function() {
             $('#box-browser').empty();
             $('#box-browser').append(this.dlView.render().el);
-        },
-
-        sync: function() {
-            $('#box-browser').empty();
-            $('#box-browser').append(this.ssView.render().el);
         },
     });
 
@@ -138,10 +89,7 @@
     });
 
     function initialize() {
-        window.spreadsheets = new SpreadsheetCollection();
-        window.spreadsheets.fetch();
         window.selectedJob = null;
-        window.selectedSpreadsheet = null;
         window.App = new DatasetExport();
         Backbone.history.start();
     }

@@ -18,7 +18,7 @@ from django.contrib.sites.models import Site
 
 from oauth2client.django_orm import Storage
 from oauth2client.client import OAuth2WebServerFlow
-from captricity_cloud_io.models import CredentialsModel, FlowModel, SyncedDocument
+from captricity_cloud_io.models import CredentialsModel, FlowModel
 import gdata.spreadsheets.client
 
 from captricity_cloud_io.tasks import upload_to_captricity_by_url, upload_to_google
@@ -151,17 +151,7 @@ def oauth2_callback(request):
 
 @login_required
 def queue_for_gdata_upload(request):
-    upload_to_google(request.POST['job_id'][0], request.user.id, False)
-    return JsonResponse({"status" : "success"})
-
-@login_required
-def register_gdata_sync(request):
-    SyncedDocument.objects.get_or_create(user=request.user, document=request.POST['document_name'], spreadsheet=request.POST['spreadsheet_id'][0])
-    return JsonResponse({"status" : "success"})
-
-@login_required
-def register_create_sync(request):
-    upload_to_google(request.POST['job_id'][0], request.user.id, True)
+    upload_to_google(request.POST['job_id'], request.user.id)
     return JsonResponse({"status" : "success"})
 
 @login_required
