@@ -1,7 +1,7 @@
 # Define your local settings here
 
 # Captricity API target
-API_TARGET = "https://nightly.captricity.com/"
+API_TARGET = "https://shreddr.captricity.com/"
 CAPTRICITY_SCHEMA_URL = API_TARGET + 'api/backbone/schema'
 CAPTRICITY_CLIENTID = "YOUR CAPTRICITY CLIENT ID HERE"
 CAPTRICITY_SECRET_KEY = "YOUR CAPTRICITY API SECRET KEY HERE"
