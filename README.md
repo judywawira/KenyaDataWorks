@@ -27,3 +27,5 @@ Once the variables are set, use the install_demouser manage.py command to instal
     ./manage.py runserver
     ./manage.py celeryd -B
 
+### License
+This is licensed under the MIT license. See LICENSE.txt.
