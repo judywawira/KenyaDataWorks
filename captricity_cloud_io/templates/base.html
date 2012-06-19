@@ -15,6 +15,7 @@
         <script type="text/javascript" src="{{STATIC_URL}}captricity_cloud_io/libs/backbone-min.js"></script>
 
         <script>
+        // Set some global variables to use the schema.js library hosted at Captricity
         window.captricity = window.captricity || {};
         {% if request.user.get_profile.captricity_api_token %}
             window.captricity.apiToken = '{{request.user.get_profile.captricity_api_token}}';
