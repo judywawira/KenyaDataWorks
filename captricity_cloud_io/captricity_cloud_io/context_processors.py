@@ -6,5 +6,6 @@ def site(request):
     return {
         'site': Site.objects.get_current(),
         'CAPTRICITY_SCHEMA_URL': settings.CAPTRICITY_SCHEMA_URL,
+        'CAPTRICITY_API_TARGET': settings.API_TARGET,
     }
 

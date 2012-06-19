@@ -15,14 +15,16 @@
         <script type="text/javascript" src="{{STATIC_URL}}captricity_cloud_io/libs/backbone-min.js"></script>
 
         <script>
+        window.captricity = window.captricity || {};
         {% if request.user.get_profile.captricity_api_token %}
-            window.captricityApiToken = '{{request.user.get_profile.captricity_api_token}}';
+            window.captricity.apiToken = '{{request.user.get_profile.captricity_api_token}}';
         {% else %}
-            window.captricityApiToken = null;
+            window.captricity.apiToken = null;
         {% endif %}
+        window.captricity.endpointURL = '{{CAPTRICITY_SCHEMA_URL}}'; 
         </script>
 
-        <script src="{% url captricity_cloud_io.views.captricity_api %}"></script>
+        <script src="{{CAPTRICITY_API_TARGET}}static/backbone/schema.js"></script>
         <script src="{{STATIC_URL}}base.js"></script>
 
         {% block sub-head %}{% endblock %}
