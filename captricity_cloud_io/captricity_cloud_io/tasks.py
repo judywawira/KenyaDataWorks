@@ -34,7 +34,7 @@ def _upload_to_captricity_by_url(source_urls, job_id, user_profile_id):
         # For each group of images in a image set, create the instance set on the captricity server
         iset = client.update_instance_sets(job_id, {'name':'iset '+str(i)})
         # Then upload in order, assuming they are in page number order
-        for page_number,file_data in enumerate(source_urls[i:i+page_count]):
+        for page_number,file_data in enumerate(source_urls[(i*page_count):(i*page_count)+page_count]):
             # Since we can't upload a url, and since the captricity python client is not compatible with "file-like" objects, so first retrieve the file from the url on to disk, then pass the local file to captricity python client to upload
             os_handle, path = tempfile.mkstemp()
             os.close(os_handle)
