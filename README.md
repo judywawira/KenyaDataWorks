@@ -14,6 +14,12 @@ This is a standalone django app that depends on some libraries. They are all def
 
     pip install -r requirements.txt
 
+You also need to install captools. Since its not listed in PyPI yet, it needs to be manually installed
+
+    git clone git@github.com:Captricity/captools.git
+    cd captools
+    python setup.py install
+
 Once the dependencies are installed, you need to define some of the API keys used to access the external APIs for Captricity, Google and box.net.
 First copy local_settings.py.example:
     
