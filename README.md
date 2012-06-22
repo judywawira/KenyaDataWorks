@@ -6,7 +6,7 @@ The Captricity Cloud IO example app allows users to:
 * Upload images from box.net to their Captricity account
 * Export Captricity job results as Google spreadsheets
 
-The Cloud IO app is built in the <a href="https://www.djangoproject.com/" target="_blank">Django web framework</a> and is a good example of using the <a href="https://github.com/Captricity/captools">Captricity Python client</a> to interact with the Captricity API.  Be sure to check out our <a href="https://shreddr.captricity.com/developer/">Developer Documentation</a> for more information about the Captricity API.
+The Cloud IO app is built in the <a href="https://www.djangoproject.com/" target="_blank">Django web framework</a> and is a good example of using the <a href="https://github.com/Captricity/captools">Captricity Python client</a> to interact with the <a href="https://shreddr.captricity.com/developer/">Captricity API</a>.
 
 
 ## Setup
