@@ -22,9 +22,7 @@ from captricity_cloud_io.models import CredentialsModel, FlowModel
 import gdata.spreadsheets.client
 
 from captricity_cloud_io.tasks import upload_to_captricity_by_url, upload_to_google
-from captricity_cloud_io.captricity_client import Client
-
-from captricity_client import generate_request_access_signature
+from captools.api.util import generate_request_access_signature
 
 @login_required
 def home(request):

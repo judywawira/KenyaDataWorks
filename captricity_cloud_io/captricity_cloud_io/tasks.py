@@ -32,7 +32,7 @@ def _upload_to_captricity_by_url(source_urls, job_id, user_profile_id):
     # Assume the images are in order, neatly sorted into image sets
     for i in range(int(math.ceil(len(source_urls) / float(page_count)))):
         # For each group of images in a image set, create the instance set on the captricity server
-        iset = client.update_instance_sets(job_id, {'name':'iset '+str(i)})
+        iset = client.create_instance_sets(job_id, {'name':'iset '+str(i)})
         # Then upload in order, assuming they are in page number order
         for page_number,file_data in enumerate(source_urls[(i*page_count):(i*page_count)+page_count]):
             # Since we can't upload a url, and since the captricity python client is not compatible with "file-like" objects, so first retrieve the file from the url on to disk, then pass the local file to captricity python client to upload
@@ -41,7 +41,7 @@ def _upload_to_captricity_by_url(source_urls, job_id, user_profile_id):
             f = open(path, "w+")
             f.write(urllib2.urlopen(file_data['url']).read())
             f.close()
-            client.update_iset_instance(iset['id'], page_number, {'image':open(path), 'image_name':os.path.splitext(os.path.basename(path))[0]})
+            client.create_iset_instance(iset['id'], page_number, {'image':open(path), 'image_name':os.path.splitext(os.path.basename(path))[0]})
             os.remove(path)
 
 def upload_to_google(job_id, user_id):

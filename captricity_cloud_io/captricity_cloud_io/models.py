@@ -7,7 +7,7 @@ import oauth2client.client
 from oauth2client.django_orm import FlowField
 from oauth2client.django_orm import CredentialsField
 
-from captricity_cloud_io.captricity_client import Client
+from captools.api import Client
 
 class UserProfile(models.Model):
     captricity_api_token = models.CharField(max_length=128, blank=True)
@@ -16,7 +16,7 @@ class UserProfile(models.Model):
 
     # Create an authenticated captricity client for the endpoint specified in the settings, using the api token received from authentication workflow for captricity
     def get_captricity_client(self):
-        return Client(endpoint=settings.CAPTRICITY_SCHEMA_URL, api_token=self.captricity_api_token)
+        return Client(api_token=self.captricity_api_token, endpoint=settings.CAPTRICITY_SCHEMA_URL)
 
 # Model for tracking phase in oauth2.0 flow
 class FlowModel(models.Model):
